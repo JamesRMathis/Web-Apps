@@ -6,7 +6,9 @@ app = Flask(__name__)
 def home():
     return send_from_directory(app.static_folder + '/home/html', 'index.html')
 
-@app
+@app.route('/cringy-ss')
+def cringy_ss():    
+    return send_from_directory(app.static_folder + '/CringySS/html', 'cringyss.html')
 
 @app.route('/bio')
 def bio():
