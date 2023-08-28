@@ -4,23 +4,169 @@ body {
     /* background-color: #000; */
 }
 
+div ~ h2 {
+    font-family: 'Caveat', cursive, sans-serif;
+    font-size: 2em;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    font-family: 'Great Vibes', cursive, sans-serif;
+    font-size: 2em;
+    position: relative;
+    top: 50%;
+    left: 50%;
+}
+
 #content {
     margin: 50px auto;
     width: 80%;
     height: 100%;
     background-color: #b0b0b0;
     /* background-color: gradient(to right, #0379ff, #ff6403); */
+    border: 10px dashed #ff6403;
     border-radius: 10px;
+    /* box-sizing: border-box; */
 }
 
 #content h1 {
     text-align: center;
+    font-family: 'Caveat', cursive, sans-serif;
+    animation: h1Rotate 2s infinite linear;
+}
+
+@keyframes h1Rotate {
+    0% {
+        transform: rotate(0deg) scale(1);
+        /* transform: scale(1); */
+    }
+
+    50% {
+        transform: rotate(360deg) scale(2);
+        /* transform: scale(1.5); */
+    }
+
+    100% {
+        transform: rotate(720deg) scale(1);
+        /* transform: scale(1); */
+    }
+}
+
+#content ul {
+    list-style-type: lower-greek;
+    animation: ulMove 2s infinite linear;
+}
+
+@keyframes ulMove {
+    0% {
+        transform: translate(0px, 0px);
+    }
+
+    25% {
+        transform: translate(100px, 0px);
+    }
+
+    50% {
+        transform: translate(100px, 100px);
+    }
+
+    75% {
+        transform: translate(0px, 100px);
+    }
+
+    100% {
+        transform: translate(0px, 0px);
+    }
 }
 
 #content .flex {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    align-items: center;
+    align-items: baseline;
     flex-wrap: wrap;
+}
+
+#languages h2 {
+    animation: blink 1s infinite;
+}
+
+#services h2 {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+
+    49% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    99% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+#content p {
+    animation: pColor 2s infinite ease-in-out;
+}
+
+@keyframes pColor {
+    0% {
+        color: #000;
+    }
+
+    25% {
+        color: rebeccapurple;
+    }
+
+    50% {
+        color: aliceblue;
+    }
+
+    75% {
+        color: rebeccapurple;
+    }
+
+    100% {
+        color: #000;
+    }
+}
+
+img {
+    position: absolute;
+    top: 50%;
+    left: 500px;
+    width: 200px;
+    height: 242px;
+}
+
+img:hover {
+    animation: spin 0.75s infinite ease-in-out;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate3d(1, 1, 1, 0deg);
+    }
+
+    100% {
+        transform: rotate3d(1, 1, 1, 360deg);
+    }
+}
+
+#title {
+    transform: rotate(30deg);
 }
