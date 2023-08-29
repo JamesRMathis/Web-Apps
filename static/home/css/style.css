@@ -3,7 +3,13 @@ body {
     background-color: #606060;
 }
 
-#card-area {
+h1 {
+    text-align: center;
+    color: white;
+    margin: 20px auto;
+}
+
+.card-area {
     display: flex;
     flex-direction: row;
     justify-content: center;

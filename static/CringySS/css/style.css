@@ -34,7 +34,7 @@ p {
 #content h1 {
     text-align: center;
     font-family: 'Caveat', cursive, sans-serif;
-    animation: h1Rotate 2s infinite linear;
+    animation: h1Rotate 5s infinite linear;
 }
 
 @keyframes h1Rotate {
@@ -56,7 +56,7 @@ p {
 
 #content ul {
     list-style-type: lower-greek;
-    animation: ulMove 2s infinite linear;
+    animation: ulMove 5s infinite linear;
 }
 
 @keyframes ulMove {
@@ -90,11 +90,11 @@ p {
 }
 
 #languages h2 {
-    animation: blink 1s infinite;
+    animation: blink 2s infinite;
 }
 
 #services h2 {
-    animation: blink 1s infinite;
+    animation: blink 2s infinite;
 }
 
 @keyframes blink {
@@ -120,7 +120,7 @@ p {
 }
 
 #content p {
-    animation: pColor 2s infinite ease-in-out;
+    animation: pColor 3s infinite ease-in-out;
 }
 
 @keyframes pColor {
@@ -154,7 +154,7 @@ img {
 }
 
 img:hover {
-    animation: spin 0.75s infinite ease-in-out;
+    animation: spin 1s infinite ease-in-out;
 }
 
 @keyframes spin {
