@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question 5</title>
+</head>
+<body>
+    <h1>Question 5</h1>
+    <h2>Choose your favorite type of book to read</h2>
+
+    <form action="/assignment4/quiz" method="get">
+
+        <input type="radio" name="answer5" value="A"> A. Science Fiction<br>
+        <input type="radio" name="answer5" value="B"> B. Fantasy<br>
+        <input type="radio" name="answer5" value="C"> C. Horror<br>
+        <input type="radio" name="answer5" value="D"> D. Mystery<br>
+        <input type="radio" name="answer5" value="E"> E. Comedy<br>
+
+        <input type="text" name="question" value="end" hidden>
+        <input type="text" name="answer1" value="{{answer1}}" hidden>
+        <input type="text" name="answer2" value="{{answer2}}" hidden>
+        <input type="text" name="answer3" value="{{answer3}}" hidden>
+        <input type="text" name="answer4" value="{{answer4}}" hidden>
+        <input type="text" name="name" value="{{name}}" hidden>
+        
+        <input type="submit" value="Next">
+</body>
+</html>

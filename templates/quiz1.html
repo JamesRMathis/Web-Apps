@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Question 1</h1>
+    <h2>What's your favorite type of movie or TV show?</h2>
+    <form action="/assignment4/quiz" method="get">
+
+        <input type="radio" name="answer1" value="A"> A. Science Fiction<br>
+        <input type="radio" name="answer1" value="B"> B. Fantasy<br>
+        <input type="radio" name="answer1" value="C"> C. Horror<br>
+        <input type="radio" name="answer1" value="D"> D. Action/Adventure<br>
+        <input type="radio" name="answer1" value="E"> E. Comedy<br>
+
+        <input type="text" name="question" value="2" hidden>
+        <input type="text" name="name" value="{{name}}" hidden>
+        <input type="submit" value="Next">
+    </form>
+</body>
+</html>

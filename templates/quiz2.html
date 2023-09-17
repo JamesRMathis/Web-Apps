@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question 2</title>
+</head>
+<body>
+    <h1>Question 2</h1>
+    <h2>Which fictional universe do you love the most?</h2>
+
+    <form action="/assignment4/quiz" method="get">
+        <input type="radio" name="answer2" value="A"> A. Star Wars<br>
+        <input type="radio" name="answer2" value="B"> B. Lord of the Rings<br>
+        <input type="radio" name="answer2" value="C"> C. The Walking Dead<br>
+        <input type="radio" name="answer2" value="D"> D. Marvel Cinematic Universe<br>
+        <input type="radio" name="answer2" value="E"> E. Harry Potter<br>
+
+        <input type="text" name="question" value="3" hidden>
+        <input type="text" name="answer1" value="{{answer1}}" hidden>
+        <input type="text" name="name" value="{{name}}" hidden>
+        
+        <input type="submit" value="Next">
+    </form>
+</body>
+</html>

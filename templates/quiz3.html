@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question 3</title>
+</head>
+<body>
+    <h1>Question 3</h1>
+    <h2>What's your favorite type of music?</h2>
+
+    <form action="/assignment4/quiz" method="get">
+        <input type="radio" name="answer3" value="A"> A. Electronic/Dance<br>
+        <input type="radio" name="answer3" value="B"> B. Metal/Rock<br>
+        <input type="radio" name="answer3" value="C"> C. Alternative/Indie<br>
+        <input type="radio" name="answer3" value="D"> D. Pop/R&B<br>
+        <input type="radio" name="answer3" value="E"> E. Classical/Jazz<br>
+
+        <input type="text" name="question" value="4" hidden>
+        <input type="text" name="answer1" value="{{answer1}}" hidden>
+        <input type="text" name="answer2" value="{{answer2}}" hidden>
+        <input type="text" name="name" value="{{name}}" hidden>
+        
+        <input type="submit" value="Next">
+    </form>
+</body>
+</html>

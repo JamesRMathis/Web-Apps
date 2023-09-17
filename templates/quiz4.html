@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question 4</title>
+</head>
+<body>
+    <h1>Question 4</h1>
+    <h2>What's your ideal vacation destination?</h2>
+
+    <form action="/assignment4/quiz" method="get">
+
+        <input type="radio" name="answer4" value="A"> A. Futuristic cityscape<br>
+        <input type="radio" name="answer4" value="B"> B. A mystical fantasy realm<br>
+        <input type="radio" name="answer4" value="C"> C. A haunted castle or spooky locale<br>
+        <input type="radio" name="answer4" value="D"> D. A tropical paradise<br>
+        <input type="radio" name="answer4" value="E"> E. A charming European city<br>
+
+        <input type="text" name="question" value="5" hidden>
+        <input type="text" name="answer1" value="{{answer1}}" hidden>
+        <input type="text" name="answer2" value="{{answer2}}" hidden>
+        <input type="text" name="answer3" value="{{answer3}}" hidden>
+        <input type="text" name="name" value="{{name}}" hidden>
+        
+        <input type="submit" value="Next">
+</body>
+</html>
