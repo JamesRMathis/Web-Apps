@@ -110,6 +110,10 @@ def quiz():
             return render_template('quizEnd.html', name=name, soulmate=soulmate, desc=desc)
     return send_from_directory(app.static_folder + '/Quiz', 'quiz.html')
 
+@app.route('/assignment5/connect4')
+def connect4():
+    return send_from_directory(app.static_folder + '/Connect4/html', 'index.html')
+
 if __name__ == '__main__':
     print('Running app...')
     app.run()
