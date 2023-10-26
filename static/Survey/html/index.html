@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey</title>
+
+    <link rel="stylesheet" href="/static/Survey/css/style.css">
+    <script src="/static/Survey/js/index.js" defer></script>
+</head>
+<body onload="takenSurvey()">
+    <div id="content">
+        <h1>Survey</h1>
+        
+        <form id="form" action="/assignment6/survey/submit-survey" method="POST">
+            <p>What is your favorite D&D class?</p>
+            <input type="radio" id="fighter" name="class" value="fighter">
+            <label for="fighter">⚔️ Fighter</label><br>
+            <input type="radio" id="wizard" name="class" value="wizard">
+            <label for="wizard">🔮 Wizard</label><br>
+            <input type="radio" id="rogue" name="class" value="rogue">
+            <label for="rogue">🗡️ Rogue</label><br>
+            <input type="radio" id="cleric" name="class" value="cleric">
+            <label for="cleric">✝️ Cleric</label><br>
+
+            <button id="submit-button" type="submit">Enter vote!</button>
+        </form>
+    </div>
+
+    <form action="/assignment6/survey/view-results" id="goToResults" hidden></form>
+</body>
+</html>

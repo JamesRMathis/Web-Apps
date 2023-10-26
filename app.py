@@ -1,4 +1,8 @@
 from flask import Flask, send_from_directory, redirect, render_template, request
+import firebase_admin
+from firebase_admin import credentials, firestore
+cred = credentials.Certificate('survey.json')
+firebase_admin.initialize_app(cred, name='survey')
 
 app = Flask(__name__)
 
@@ -113,6 +117,44 @@ def quiz():
 @app.route('/assignment5/connect4')
 def connect4():
     return send_from_directory(app.static_folder + '/Connect4/html', 'index.html')
+
+@app.route('/assignment6/survey')
+def survey():
+    return send_from_directory(app.static_folder + '/Survey/html', 'index.html')
+
+@app.route('/assignment6/survey/submit-survey', methods=['POST'])
+def submit_survey():
+    db = firestore.client(app=firebase_admin.get_app('survey'))
+
+    print('submitting survey')
+    vote = request.form['class']
+    if vote == 'fighter':
+        db.collection('votes').document('fighter').update({'votes': firestore.Increment(1)})
+    elif vote == 'wizard':
+        db.collection('votes').document('wizard').update({'votes': firestore.Increment(1)})
+    elif vote == 'rogue':
+        db.collection('votes').document('rogue').update({'votes': firestore.Increment(1)})
+    elif vote == 'cleric':
+        db.collection('votes').document('cleric').update({'votes': firestore.Increment(1)})
+
+    return redirect('/assignment6/survey/view-results')
+
+@app.route('/assignment6/survey/view-results')
+def view_results():
+    return send_from_directory(app.static_folder + '/Survey/html', 'results.html')
+
+@app.route('/assignment6/survey/results', methods=['GET'])
+def results():
+    import json
+    db = firestore.client(app=firebase_admin.get_app('survey'))
+
+    fighter = db.collection('votes').document('fighter').get().to_dict()['votes']
+    wizard = db.collection('votes').document('wizard').get().to_dict()['votes']
+    rogue = db.collection('votes').document('rogue').get().to_dict()['votes']
+    cleric = db.collection('votes').document('cleric').get().to_dict()['votes']
+
+    return json.dumps({'fighter': fighter, 'wizard': wizard, 'rogue': rogue, 'cleric': cleric})
+
 
 if __name__ == '__main__':
     print('Running app...')
