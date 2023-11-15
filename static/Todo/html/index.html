@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo</title>
+
+    <link rel="stylesheet" href="/static/todo/css/style.css">
+    <script src="/static/todo/js/script.js" defer></script>
+    <script>
+        
+
+        function getLists() {
+            fetch('/assignment7/todo/lists')
+            .then(response => response.json())
+            .then(lists => {
+                console.log(Object.keys(lists));
+                const listsDiv = document.getElementById('lists');
+                listsDiv.innerHTML = '';
+
+                Object.keys(lists).forEach(list => {
+                    if (list === 'error') return
+
+                    const option = document.createElement('option')
+                    const selectElement = document.getElementById('list')
+                    option.value = list
+                    option.innerHTML = list
+                    selectElement.appendChild(option)
+                    selectElement.value = list
+
+                    const listElement = document.createElement('div');
+                    listElement.innerHTML = list;
+                    
+                    if (!Array.isArray(lists[list])) {
+                        lists[list] = [lists[list]]
+                    }
+
+                    listsDiv.appendChild(listElement);
+
+                    i = 0
+                    lists[list].forEach(task => {
+                        let inputElement = document.createElement('input');
+                        // inputElement.innerHTML = 'X';
+                        inputElement.type = 'checkbox';
+                        console.log(task);
+
+                        let taskElement = document.createElement('label');
+                        taskElement.appendChild(inputElement);
+                        taskElement.innerHTML += task.task;
+                        listElement.appendChild(taskElement);
+
+                        inputElement.onclick = (event) => {
+                            event.preventDefault();
+
+                            console.log('clicked');
+
+                            fetch(`/assignment7/todo/${list}/${i}/toggle`)
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if (!response.error) {
+                                    listElement.removeChild(inputElement.parentElement)
+                                }
+                            })
+                        };
+
+                        i++
+                    });
+                })
+            });
+        }
+    </script>
+</head>
+<body onload="getLists()">
+    <div id="lists"></div>
+
+    <form action="" method="post" id="addTaskForm">
+        <label for="task">Task</label>
+        <input type="text" name="task" id="task">
+
+        <label for="list">Which list should this task be added to?</label>
+        <select name="list" id="list">
+            <option value="new">New list</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+
+</body>
+<script>
+    const addTaskForm = document.getElementById('addTaskForm');
+    console.log(addTaskForm);
+
+    addTaskForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(addTaskForm);
+        console.log(formData);
+        const task = formData.get('task');
+        const list = formData.get('list');
+        console.log(task, list);
+
+        fetch('/assignment7/todo/add', {
+            method: 'POST',
+            body: JSON.stringify({
+                task: task,
+                list: list
+            })
+        })
+        .then(response => console.log(response))
+        .then(response => {
+            console.log(response);
+            if (!response.error) {
+                document.cookie = `userid=${response.userid}`;
+                getLists();
+            }
+        })
+    })
+</script>
+</html>

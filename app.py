@@ -1,10 +1,18 @@
-from flask import Flask, send_from_directory, redirect, render_template, request
+from flask import Flask, send_from_directory, redirect, render_template, request, make_response, jsonify
 import firebase_admin
 from firebase_admin import credentials, firestore
-cred = credentials.Certificate('survey.json')
-firebase_admin.initialize_app(cred, name='survey')
 
-app = Flask(__name__)
+if __name__ == '__main__':
+    credSurvey = credentials.Certificate('survey.json')
+    credTodo = credentials.Certificate('todo.json')
+else:
+    credSurvey = credentials.Certificate('/home/JamesRFMathis/web-apps/survey.json')
+    credTodo = credentials.Certificate('/home/JamesRFMathis/web-apps/todo.json')
+
+firebase_admin.initialize_app(credSurvey, name='survey')
+firebase_admin.initialize_app(credTodo, name='todo')
+
+app = Flask(__name__, static_folder='static')
 
 @app.route('/')
 def home():
@@ -155,6 +163,64 @@ def results():
 
     return json.dumps({'fighter': fighter, 'wizard': wizard, 'rogue': rogue, 'cleric': cleric})
 
+@app.route('/assignment7/todo')
+def todo():
+    return send_from_directory(app.static_folder + '/Todo/html', 'index.html')
+
+@app.route('/assignment7/todo/lists', methods=['GET'])
+def lists():
+    import json
+
+    if request.cookies.get('userid') is None:
+        return json.dumps({'error': 'No user id found'})
+
+    userid = request.cookies.get('userid')
+
+    db = firestore.client(app=firebase_admin.get_app('todo'))
+
+    lists = db.collection('lists').document(str(userid)).get().to_dict()
+
+    return json.dumps(lists)
+
+@app.route('/assignment7/todo/add', methods=['POST'])
+def add_todo():
+    import uuid
+
+    if request.cookies.get('userid') is None:
+        userid = uuid.uuid4()
+    else:
+        userid = request.cookies.get('userid')
+
+    db = firestore.client(app=firebase_admin.get_app('todo'))
+    print(userid)
+    task = request.form['task']
+    listName = request.form['list']
+
+    if db.collection('lists').document(str(userid)).get().to_dict() is None:
+        db.collection('lists').document(str(userid)).set({f'{listName}': {'task': task, 'completed': False}})
+    else:
+        db.collection('lists').document(str(userid)).update({f'{listName}': firestore.ArrayUnion([{'task': task, 'completed': False}])})
+
+    return jsonify({'success': True, 'userid': userid})
+
+@app.route('/assignment7/todo/<string:list>/<int:task>/toggle', methods=['POST'])
+def toggle_todo(list, task):
+    import json
+
+    if request.cookies.get('userid') is None:
+        return json.dumps({'error': 'No user id found'})
+
+    userid = request.cookies.get('userid')
+
+    db = firestore.client(app=firebase_admin.get_app('todo'))
+
+    if db.collection('lists').document(str(userid)).get().to_dict() is None:
+        return json.dumps({'error': 'No lists found'})
+
+    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayRemove([{'task': task, 'completed': False}])})
+    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayUnion([{'task': task, 'completed': True}])})
+
+    return json.dumps({'success': True})
 
 if __name__ == '__main__':
     print('Running app...')
