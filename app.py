@@ -234,6 +234,33 @@ def toggle_todo(list, task, taskID):
 
     return json.dumps({'success': True})
 
+@app.route('/assignment7/todo/<string:list>/<string:task>/<int:taskID>/delete')
+def delete_task(list, task, taskID):
+    print(list, task, taskID)
+
+    import json
+
+    if request.cookies.get('userid') is None:
+        return json.dumps({'error': 'No user id found'})
+
+    userid = request.cookies.get('userid')
+
+    db = firestore.client(app=firebase_admin.get_app('todo'))
+
+    if db.collection('lists').document(str(userid)).get().to_dict() is None:
+        return json.dumps({'error': 'No lists found'})
+    
+    userRef = db.collection('lists').document(str(userid)).get().to_dict()
+
+    try:
+        completed = userRef[list][taskID]['completed']
+    except:
+        completed = userRef[list]['completed']
+
+    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayRemove([{'task': task, 'completed': completed}])})
+
+    return json.dumps({'success': True})
+
 if __name__ == '__main__':
     print('Running app...')
     app.run()

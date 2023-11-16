@@ -1,3 +1,32 @@
+const addTaskForm = document.getElementById('addTaskForm');
+console.log(addTaskForm);
+
+addTaskForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(addTaskForm);
+    console.log(formData);
+    const task = formData.get('task');
+    const list = formData.get('list');
+    console.log(task, list);
+
+    fetch('/assignment7/todo/add', {
+        method: 'POST',
+        body: JSON.stringify({
+            task: task,
+            list: list
+        })
+    })
+    .then(response => response.json())
+    .then(response => {
+        console.log('response: ' + response);
+        if (!response.error) {
+            document.cookie = `userid=${response.userid}`;
+            getLists();
+        }
+    })
+})
+
 let selectElement = document.getElementById('list')
 selectElement.addEventListener('click', () => {
     const optionsCount = document.querySelectorAll('#list option').length
@@ -22,6 +51,7 @@ selectElement.addEventListener('change', () => {
             option.value = newList
             option.innerHTML = newList
             selectElement.appendChild(option)
+            // make the new selection the new list
             selectElement.value = newList
         }
     }
