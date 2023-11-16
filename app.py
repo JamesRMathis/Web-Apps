@@ -185,6 +185,7 @@ def lists():
 @app.route('/assignment7/todo/add', methods=['POST'])
 def add_todo():
     import uuid
+    import json
 
     if request.cookies.get('userid') is None:
         userid = uuid.uuid4()
@@ -192,19 +193,23 @@ def add_todo():
         userid = request.cookies.get('userid')
 
     db = firestore.client(app=firebase_admin.get_app('todo'))
-    print(userid)
-    task = request.form['task']
-    listName = request.form['list']
+    # print(userid)
+    data = json.loads(request.data)
+    task = data['task']
+    listName = data['list']
+    # print(task, listName)
 
     if db.collection('lists').document(str(userid)).get().to_dict() is None:
         db.collection('lists').document(str(userid)).set({f'{listName}': {'task': task, 'completed': False}})
     else:
         db.collection('lists').document(str(userid)).update({f'{listName}': firestore.ArrayUnion([{'task': task, 'completed': False}])})
+    
+    return json.dumps({'error': False, 'userid': str(userid)})
 
-    return jsonify({'success': True, 'userid': userid})
+@app.route('/assignment7/todo/<string:list>/<string:task>/<int:taskID>/toggle')
+def toggle_todo(list, task, taskID):
+    print(list, task, taskID)
 
-@app.route('/assignment7/todo/<string:list>/<int:task>/toggle', methods=['POST'])
-def toggle_todo(list, task):
     import json
 
     if request.cookies.get('userid') is None:
@@ -216,9 +221,16 @@ def toggle_todo(list, task):
 
     if db.collection('lists').document(str(userid)).get().to_dict() is None:
         return json.dumps({'error': 'No lists found'})
+    
+    userRef = db.collection('lists').document(str(userid)).get().to_dict()
 
-    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayRemove([{'task': task, 'completed': False}])})
-    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayUnion([{'task': task, 'completed': True}])})
+    try:
+        completed = userRef[list][taskID]['completed']
+    except:
+        completed = userRef[list]['completed']
+
+    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayRemove([{'task': task, 'completed': completed}])})
+    db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayUnion([{'task': task, 'completed': not completed}])})
 
     return json.dumps({'success': True})
 

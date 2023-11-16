@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="/static/todo/css/style.css">
     <script src="/static/todo/js/script.js" defer></script>
     <script>
-        
-
         function getLists() {
             fetch('/assignment7/todo/lists')
             .then(response => response.json())
@@ -17,19 +15,21 @@
                 console.log(Object.keys(lists));
                 const listsDiv = document.getElementById('lists');
                 listsDiv.innerHTML = '';
-
+                
+                const selectElement = document.getElementById('list')
+                const existingOptions = new Set(Array.from(selectElement.options).map(option => option.value))
                 Object.keys(lists).forEach(list => {
                     if (list === 'error') return
 
-                    const option = document.createElement('option')
-                    const selectElement = document.getElementById('list')
-                    option.value = list
-                    option.innerHTML = list
-                    selectElement.appendChild(option)
-                    selectElement.value = list
+                    if (!existingOptions.has(list)) {
+                        const option = document.createElement('option')
+                        option.value = list
+                        option.innerHTML = list
+                        selectElement.appendChild(option)
+                    }
 
                     const listElement = document.createElement('div');
-                    listElement.innerHTML = list;
+                    listElement.innerHTML = `<h2>${list}</h2>`;
                     
                     if (!Array.isArray(lists[list])) {
                         lists[list] = [lists[list]]
@@ -37,32 +37,41 @@
 
                     listsDiv.appendChild(listElement);
 
+                    const completed = lists[list].filter(task => task.completed)
+                    const incomplete = lists[list].filter(task => !task.completed)
+
+                    const completedElement = document.createElement('div')
+                    completedElement.innerHTML = `<h3>Completed</h3>`
+                    listElement.appendChild(completedElement)
+
+                    const incompleteElement = document.createElement('div')
+                    incompleteElement.innerHTML = `<h3>Incomplete</h3>`
+                    listElement.appendChild(incompleteElement)
+
                     i = 0
                     lists[list].forEach(task => {
-                        let inputElement = document.createElement('input');
-                        // inputElement.innerHTML = 'X';
-                        inputElement.type = 'checkbox';
-                        console.log(task);
+                        let checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = task.completed;
 
                         let taskElement = document.createElement('label');
-                        taskElement.appendChild(inputElement);
-                        taskElement.innerHTML += task.task;
-                        listElement.appendChild(taskElement);
+                        taskElement.appendChild(checkbox);
+                        taskElement.insertAdjacentHTML('beforeend', task.task);
+                        (task.completed ? completedElement : incompleteElement).appendChild(taskElement);
 
-                        inputElement.onclick = (event) => {
-                            event.preventDefault();
-
-                            console.log('clicked');
-
-                            fetch(`/assignment7/todo/${list}/${i}/toggle`)
+                        function createOnCickHandler(i) {
+                            return () => {
+                            console.log(i, task.task);  
+                            fetch(`/assignment7/todo/${list}/${task.task}/${i}/toggle`)
                             .then(response => response.json())
                             .then(response => {
-                                console.log(response);
                                 if (!response.error) {
-                                    listElement.removeChild(inputElement.parentElement)
+                                    getLists();
                                 }
-                            })
-                        };
+                            })}
+                        }
+
+                        checkbox.onclick = createOnCickHandler(i);
 
                         i++
                     });
@@ -107,9 +116,9 @@
                 list: list
             })
         })
-        .then(response => console.log(response))
+        .then(response => response.json())
         .then(response => {
-            console.log(response);
+            console.log('response: ' + response);
             if (!response.error) {
                 document.cookie = `userid=${response.userid}`;
                 getLists();
