@@ -1,18 +1,67 @@
-from flask import Flask, send_from_directory, redirect, render_template, request, make_response, jsonify
+import os
+import json
+import requests
+from functools import wraps
+from flask import (
+    Flask, 
+    send_from_directory, 
+    redirect, 
+    render_template, 
+    request,
+    session, 
+    abort
+)
 import firebase_admin
 from firebase_admin import credentials, firestore
+from google_auth_oauthlib.flow import Flow
+import google.auth.transport.requests
+from google.oauth2 import id_token
+import cachecontrol
 
 if __name__ == '__main__':
     credSurvey = credentials.Certificate('survey.json')
     credTodo = credentials.Certificate('todo.json')
+    credQuickNotes = credentials.Certificate('quicknotes.json')
 else:
     credSurvey = credentials.Certificate('/home/JamesRFMathis/web-apps/survey.json')
     credTodo = credentials.Certificate('/home/JamesRFMathis/web-apps/todo.json')
+    credQuickNotes = credentials.Certificate('/home/JamesRFMathis/web-apps/quicknotes.json')
 
 firebase_admin.initialize_app(credSurvey, name='survey')
 firebase_admin.initialize_app(credTodo, name='todo')
+firebase_admin.initialize_app(credQuickNotes, name='quicknotes')
 
 app = Flask(__name__, static_folder='static')
+
+if __name__ == '__main__':
+    app.secret_key = json.load(open('quicknotes-oauth.json', 'r'))['web']['client_secret']
+    clientID = json.load(open('quicknotes-oauth.json', 'r'))['web']['client_id']
+
+    flow = Flow.from_client_secrets_file(
+        client_secrets_file='quicknotes-oauth.json',
+        scopes=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'openid'],
+        redirect_uri='http://localhost:5000/assignment8/callback'
+    )
+else:
+    app.secret_key = json.load(open('/home/JamesRFMathis/web-apps/quicknotes-oauth.json'))['web']['client_secret']
+    clientID = json.load(open('/home/JamesRFMathis/web-apps/quicknotes-oauth.json'))['web']['client_id']
+
+    flow = Flow.from_client_secrets_file(
+        client_secrets_file='/home/JamesRFMathis/web-apps/quicknotes-oauth.json',
+        scopes=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'openid'],
+        redirect_uri='http://localhost:5000/assignment8/callback'
+    )
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+def loginRequired(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        if 'sub' not in session:
+            return redirect('/')
+        else:
+            return function()
+    return wrapper
 
 @app.route('/')
 def home():
@@ -169,8 +218,6 @@ def todo():
 
 @app.route('/assignment7/todo/lists', methods=['GET'])
 def lists():
-    import json
-
     if request.cookies.get('userid') is None:
         return json.dumps({'error': 'No user id found'})
 
@@ -185,7 +232,6 @@ def lists():
 @app.route('/assignment7/todo/add', methods=['POST'])
 def add_todo():
     import uuid
-    import json
 
     if request.cookies.get('userid') is None:
         userid = uuid.uuid4()
@@ -209,8 +255,6 @@ def add_todo():
 @app.route('/assignment7/todo/<string:list>/<string:task>/<int:taskID>/toggle')
 def toggle_todo(list, task, taskID):
     print(list, task, taskID)
-
-    import json
 
     if request.cookies.get('userid') is None:
         return json.dumps({'error': 'No user id found'})
@@ -238,8 +282,6 @@ def toggle_todo(list, task, taskID):
 def delete_task(list, task, taskID):
     print(list, task, taskID)
 
-    import json
-
     if request.cookies.get('userid') is None:
         return json.dumps({'error': 'No user id found'})
 
@@ -258,6 +300,82 @@ def delete_task(list, task, taskID):
         completed = userRef[list]['completed']
 
     db.collection('lists').document(str(userid)).update({f'{list}': firestore.ArrayRemove([{'task': task, 'completed': completed}])})
+
+    return json.dumps({'success': True})
+
+@app.route('/assignment8/quicknotes')
+def quicknotes():
+    return render_template('login/base.html', session=session)
+
+@app.route('/assignment8/login')
+def login():
+    authorization_url, state = flow.authorization_url()
+    print(state)
+    session['state'] = state
+    return redirect(authorization_url)
+
+@app.route('/assignment8/logout')
+def logout():
+    session.clear()
+    return redirect('/assignment8/quicknotes')
+
+@app.route('/assignment8/callback')
+def callback():
+    flow.fetch_token(authorization_response=request.url)
+
+    if not session['state'] == request.args['state']:
+        abort(500)
+
+    credentials = flow.credentials
+    request_session = requests.session()
+    cached_session = cachecontrol.CacheControl(request_session)
+    token_request = google.auth.transport.requests.Request(session=cached_session)
+
+    id_info = id_token.verify_oauth2_token(
+        id_token=credentials._id_token,
+        request=token_request,
+        audience=clientID
+    )
+    print(id_info)
+
+    session.update(id_info)
+
+    db = firestore.client(app=firebase_admin.get_app('quicknotes'))
+
+    if db.collection('notes').document(session['sub']).get().to_dict() is None:
+        db.collection('notes').document(session['sub']).set({})
+
+    return redirect('/assignment8/quicknotes')
+
+@app.route('/assignment8/getNotes')
+@loginRequired
+def getNotes():
+    db = firestore.client(app=firebase_admin.get_app('quicknotes'))
+
+    notes = db.collection('notes').document(session['sub']).get().to_dict()
+
+    return json.dumps(notes)
+
+@app.route('/assignment8/addNote', methods=['POST'])
+@loginRequired
+def addNote():
+    db = firestore.client(app=firebase_admin.get_app('quicknotes'))
+    print(request.data)
+
+    data = json.loads(request.data)
+
+    db.collection('notes').document(session['sub']).update({f'{data["title"]}': data['content']})
+
+    return json.dumps({'success': True})
+
+@app.route('/assignment8/deleteNote', methods=['POST'])
+@loginRequired
+def deleteNote():
+    db = firestore.client(app=firebase_admin.get_app('quicknotes'))
+
+    data = json.loads(request.data)
+
+    db.collection('notes').document(session['sub']).update({f'{data["title"]}': firestore.DELETE_FIELD})
 
     return json.dumps({'success': True})
 
