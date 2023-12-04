@@ -42,6 +42,8 @@ if __name__ == '__main__':
         scopes=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'openid'],
         redirect_uri='http://localhost:5000/assignment8/callback'
     )
+
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
     app.secret_key = json.load(open('/home/JamesRFMathis/web-apps/quicknotes-oauth.json'))['web']['client_secret']
     clientID = json.load(open('/home/JamesRFMathis/web-apps/quicknotes-oauth.json'))['web']['client_id']
@@ -49,10 +51,8 @@ else:
     flow = Flow.from_client_secrets_file(
         client_secrets_file='/home/JamesRFMathis/web-apps/quicknotes-oauth.json',
         scopes=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'openid'],
-        redirect_uri='http://localhost:5000/assignment8/callback'
+        redirect_uri='http://jamesrfmathis.pythonanywhere.com/assignment8/callback'
     )
-
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 def loginRequired(function):
     @wraps(function)
