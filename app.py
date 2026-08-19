@@ -40,7 +40,7 @@ if __name__ == '__main__':
     flow = Flow.from_client_secrets_file(
         client_secrets_file='quicknotes-oauth.json',
         scopes=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'openid'],
-        redirect_uri='http://localhost:5000/assignment8/callback'
+        redirect_uri='https://web-apps-6asj.onrender.com/assignment8/callback'
     )
 
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
