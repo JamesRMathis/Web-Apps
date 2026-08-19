@@ -51,7 +51,7 @@ else:
     flow = Flow.from_client_secrets_file(
         client_secrets_file='/home/JamesRFMathis/web-apps/quicknotes-oauth.json',
         scopes=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email', 'openid'],
-        redirect_uri='http://jamesrfmathis.pythonanywhere.com/assignment8/callback'
+        redirect_uri='https://web-apps-6asj.onrender.com/assignment8/callback'
     )
 
 def loginRequired(function):
